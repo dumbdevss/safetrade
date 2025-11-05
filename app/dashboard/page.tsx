@@ -6,6 +6,7 @@ import { Shield, Plus, Search, Bell, User, Settings, LogOut, ToggleLeft, ToggleR
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import { formatNaira } from '@/utils/currency';
 
 type UserMode = 'buyer' | 'seller';
 
@@ -238,7 +239,7 @@ export default function DashboardPage() {
               <div>
                 <p className="text-gray-400 text-sm">Total Value</p>
                 <p className="text-2xl font-bold text-white">
-                  ${deals.reduce((sum, deal) => sum + deal.amount, 0).toLocaleString()}
+                  {formatNaira(deals.reduce((sum, deal) => sum + deal.amount, 0))}
                 </p>
               </div>
               <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
@@ -318,13 +319,13 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center space-x-4 text-sm text-gray-400">
                           <span>Deal ID: {deal.deal_code}</span>
-                          <span>${deal.amount.toLocaleString()}</span>
+                          <span>{formatNaira(deal.amount)}</span>
                           <span>{new Date(deal.created_at).toLocaleDateString()}</span>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
                         <Link
-                          href={`/dashboard/deals/${deal.id}`}
+                          href={`/deal/${deal.deal_code}`}
                           className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
                         >
                           View Details

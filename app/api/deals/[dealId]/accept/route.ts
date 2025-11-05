@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { dealId: string } }
+  { params }: { params: Promise<{ dealId: string }> }
 ) {
   try {
     const user = await getCurrentUser()
@@ -16,7 +16,7 @@ export async function POST(
       )
     }
 
-    const { dealId } = params
+    const { dealId } = await params
 
     // Check if deal exists and is in pending status
     const deal = await getDealById(dealId)

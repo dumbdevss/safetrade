@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { dealCode: string } }
+  { params }: { params: Promise<{ dealCode: string }> }
 ) {
   try {
-    const { dealCode } = params
+    const { dealCode } = await params
 
     const deal = await getDealByCode(dealCode)
 

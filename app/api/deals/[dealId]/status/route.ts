@@ -5,7 +5,7 @@ import { Deal } from '@/types/database'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { dealId: string } }
+  { params }: { params: Promise<{ dealId: string }> }
 ) {
   try {
     const user = await getCurrentUser()
@@ -17,7 +17,7 @@ export async function PUT(
       )
     }
 
-    const { dealId } = params
+    const { dealId } = await params
     const { status } = await request.json()
 
     if (!status) {

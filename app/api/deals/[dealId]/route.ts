@@ -4,11 +4,11 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { dealId: string } }
+  { params }: { params: Promise<{ dealId: string }> }
 ) {
   try {
     const user = await getCurrentUser()
-    const { dealId } = params
+    const { dealId } = await params
 
     const deal = await getDealById(dealId)
 
@@ -59,7 +59,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { dealId: string } }
+  { params }: { params: Promise<{ dealId: string }> }
 ) {
   try {
     const user = await getCurrentUser()
@@ -71,7 +71,7 @@ export async function PUT(
       )
     }
 
-    const { dealId } = params
+    const { dealId } = await params
     const updates = await request.json()
 
     // Get the deal first to check permissions
@@ -136,7 +136,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { dealId: string } }
+  { params }: { params: Promise<{ dealId: string }> }
 ) {
   try {
     const user = await getCurrentUser()
@@ -148,7 +148,7 @@ export async function DELETE(
       )
     }
 
-    const { dealId } = params
+    const { dealId } = await params
 
     const cancelledDeal = await cancelDeal(dealId, user.id)
 
