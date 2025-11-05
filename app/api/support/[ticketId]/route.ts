@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { ticketId: string } }
+  { params }: { params: Promise<{ ticketId: string }> }
 ) {
   try {
     const user = await getCurrentUser()
@@ -16,7 +16,7 @@ export async function GET(
       )
     }
 
-    const { ticketId } = params
+    const { ticketId } = await params
     const supabase = await createClient()
 
     const { data: ticket, error } = await supabase
@@ -51,7 +51,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { ticketId: string } }
+  { params }: { params: Promise<{ ticketId: string }> }
 ) {
   try {
     const user = await getCurrentUser()
@@ -63,7 +63,7 @@ export async function PUT(
       )
     }
 
-    const { ticketId } = params
+    const { ticketId } = await params
     const { subject, description, priority } = await request.json()
 
     const supabase = await createClient()

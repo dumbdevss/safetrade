@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { messageId: string } }
+  { params }: { params: Promise<{ messageId: string }> }
 ) {
   try {
     const user = await getCurrentUser()
@@ -16,7 +16,7 @@ export async function PUT(
       )
     }
 
-    const { messageId } = params
+    const { messageId } = await params
     const supabase = await createClient()
 
     // Get the message first to check permissions

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { transactionId: string } }
+  { params }: { params: Promise<{ transactionId: string }> }
 ) {
   try {
     const user = await getCurrentUser()
@@ -16,7 +16,7 @@ export async function GET(
       )
     }
 
-    const { transactionId } = params
+    const { transactionId } = await params
     const supabase = await createClient()
 
     const { data: transaction, error } = await supabase
@@ -66,7 +66,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { transactionId: string } }
+  { params }: { params: Promise<{ transactionId: string }> }
 ) {
   try {
     const user = await getCurrentUser()
@@ -78,7 +78,7 @@ export async function PUT(
       )
     }
 
-    const { transactionId } = params
+    const { transactionId } = await params
     const { status, paymentReference } = await request.json()
 
     const supabase = await createClient()
