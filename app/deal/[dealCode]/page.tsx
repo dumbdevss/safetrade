@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Shield, Package, Globe, Truck, DollarSign, Clock, User, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Shield, Package, Globe, Truck, DollarSign, Clock, User, CheckCircle, AlertTriangle, Copy, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -336,6 +336,40 @@ function DealViewClient({ dealCode }: { dealCode: string }) {
               </div>
             </div>
 
+            {/* Share Deal - Only show if user is the seller */}
+            {user && deal.seller_id === user.id && (
+              <div className="bg-gray-900/50 p-6 rounded-2xl border border-gray-700/50">
+                <h3 className="text-lg font-semibold text-white mb-4">Share This Deal</h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Share this link with potential buyers. They can view and accept the deal without creating an account first.
+                </p>
+                
+                <div className="flex items-center space-x-3 p-3 bg-gray-800/50 rounded-lg border border-gray-600 mb-4">
+                  <Globe className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <input
+                    type="text"
+                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/deal/${deal.deal_code}`}
+                    readOnly
+                    className="flex-1 bg-transparent text-white text-sm font-mono focus:outline-none"
+                  />
+                  <button
+                    onClick={() => {
+                      const dealLink = `${window.location.origin}/deal/${deal.deal_code}`;
+                      navigator.clipboard.writeText(dealLink);
+                    }}
+                    className="flex items-center space-x-1 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm transition-colors"
+                  >
+                    <Copy className="w-3 h-3" />
+                    <span>Copy</span>
+                  </button>
+                </div>
+                
+                <div className="text-xs text-gray-500">
+                  Deal Code: <span className="font-mono text-gray-400">{deal.deal_code}</span>
+                </div>
+              </div>
+            )}
+
             {/* Deal Expiry */}
             <div className={`p-4 rounded-lg border ${isExpiringSoon ? 'bg-yellow-500/10 border-yellow-500/20' : 'bg-gray-800/50 border-gray-600'}`}>
               <div className="flex items-center space-x-2 mb-2">
@@ -352,20 +386,52 @@ function DealViewClient({ dealCode }: { dealCode: string }) {
               )}
             </div>
 
-            {/* Accept Deal Button */}
+            {/* Action Buttons - Different for Owner vs Buyer */}
             <div className="space-y-4">
-              <button
-                onClick={handleAcceptDeal}
-                disabled={accepting}
-                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {accepting ? 'Processing...' : user ? 'Accept Deal' : 'Accept Deal & Sign Up'}
-              </button>
-              
-              {!user && (
-                <p className="text-gray-400 text-sm text-center">
-                  No account needed to view. You'll create one after accepting.
-                </p>
+              {user && deal.seller_id === user.id ? (
+                // Deal Owner View
+                <>
+                  <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-lg">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <CheckCircle className="w-5 h-5 text-indigo-400" />
+                      <span className="text-indigo-400 font-medium text-sm">Your Deal</span>
+                    </div>
+                    <p className="text-gray-300 text-xs">
+                      This is your deal. Share the link above with potential buyers.
+                    </p>
+                  </div>
+                  
+                  <Link
+                    href="/dashboard"
+                    className="w-full bg-gradient-to-r from-gray-700 to-gray-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-gray-600 hover:to-gray-500 transition-all duration-200 text-center block"
+                  >
+                    Go to Dashboard
+                  </Link>
+                  
+                  <Link
+                    href="/dashboard/create-deal"
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 text-center block"
+                  >
+                    Create Another Deal
+                  </Link>
+                </>
+              ) : (
+                // Buyer View
+                <>
+                  <button
+                    onClick={handleAcceptDeal}
+                    disabled={accepting}
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {accepting ? 'Processing...' : user ? 'Accept Deal' : 'Accept Deal & Sign Up'}
+                  </button>
+                  
+                  {!user && (
+                    <p className="text-gray-400 text-sm text-center">
+                      No account needed to view. You'll create one after accepting.
+                    </p>
+                  )}
+                </>
               )}
               
               <div className="text-center">

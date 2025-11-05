@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Shield, Plus, Search, Bell, User, Settings, LogOut, ToggleLeft, ToggleRight, 
-         ShoppingBag, Store, DollarSign, Clock, CheckCircle, AlertCircle, TrendingUp } from 'lucide-react';
+         ShoppingBag, Store, DollarSign, Clock, CheckCircle, AlertCircle, TrendingUp, Copy, ExternalLink, Check } from 'lucide-react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -25,6 +25,7 @@ export default function DashboardPage() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [copiedDealId, setCopiedDealId] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -75,6 +76,13 @@ export default function DashboardPage() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push('/');
+  };
+
+  const copyDealLink = async (dealCode: string, dealId: string) => {
+    const dealLink = `${window.location.origin}/deal/${dealCode}`;
+    await navigator.clipboard.writeText(dealLink);
+    setCopiedDealId(dealId);
+    setTimeout(() => setCopiedDealId(null), 2000);
   };
 
   const getStatusColor = (status: string) => {
@@ -326,10 +334,27 @@ export default function DashboardPage() {
                       <div className="flex items-center space-x-3">
                         <Link
                           href={`/deal/${deal.deal_code}`}
-                          className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+                          className="flex items-center space-x-1 text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
                         >
-                          View Details
+                          <ExternalLink className="w-4 h-4" />
+                          <span>View Details</span>
                         </Link>
+                        <button
+                          onClick={() => copyDealLink(deal.deal_code, deal.id)}
+                          className="flex items-center space-x-1 text-gray-400 hover:text-gray-300 font-medium transition-colors"
+                        >
+                          {copiedDealId === deal.id ? (
+                            <>
+                              <Check className="w-4 h-4 text-green-400" />
+                              <span className="text-green-400">Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-4 h-4" />
+                              <span>Copy Link</span>
+                            </>
+                          )}
+                        </button>
                       </div>
                     </div>
                   </div>
